@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AstroMates Club | Brutalist Space</title>
 
+    <!-- FAVICON (SITE ICON) -->
+    <link rel="icon" type="image/png" href="images/l2.png" />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@500;800&display=swap"
       rel="stylesheet"
@@ -64,6 +67,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        will-change: transform, opacity;
       }
 
       .loader-line-wrapper {
@@ -93,10 +97,10 @@
 
       #loader-counter {
         position: absolute;
-        bottom: 2vh;
+        bottom: 4vh;
         right: 4vw;
         font-family: var(--font-display);
-        font-size: clamp(5rem, 15vw, 12rem);
+        font-size: clamp(4rem, 15vw, 12rem);
         color: #111111;
         line-height: 0.8;
         letter-spacing: -2px;
@@ -341,9 +345,7 @@
         left: 0;
         width: 100vw;
         height: 100%;
-        opacity: 0;
         pointer-events: none;
-        will-change: opacity;
       }
 
       .moon-img {
@@ -385,6 +387,11 @@
         background-color: var(--bg-dark);
         position: relative;
         z-index: 20;
+        margin-top: -15vh;
+      }
+
+      #moon-zone {
+        margin-top: -15vh;
       }
 
       .air-layout-container {
@@ -474,7 +481,7 @@
       }
 
       .activities {
-        padding: 5vh 5% 10vh 5%;
+        padding: 5vh 5% 5vh 5%;
         max-width: 1600px;
         margin: 0 auto;
         position: relative;
@@ -695,17 +702,6 @@
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
       }
 
-      .contact-logo {
-        width: 60px;
-        height: 60px;
-        margin-top: 1.5rem;
-        background-color: #fff;
-        border-radius: 0;
-        object-fit: contain;
-        padding: 5px;
-      }
-
-      /* CONTINUOUS TICKER STRIP */
       .ticker-wrap {
         position: absolute;
         bottom: 0;
@@ -720,11 +716,10 @@
       }
       .ticker-move {
         display: flex;
-        width: 200%;
-        animation: ticker 10s linear infinite;
+        width: max-content;
+        animation: ticker 15s linear infinite;
       }
       .ticker-item {
-        width: 50%;
         flex-shrink: 0;
         color: #fff;
         font-family: var(--font-display);
@@ -793,7 +788,7 @@
         perspective: 1200px;
         width: 90vw;
         max-width: 800px;
-        height: 80vh; /* Giving plenty of room for natural size */
+        height: 80vh;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
       }
@@ -815,7 +810,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: transparent; /* Remove background constraints */
+        background: transparent;
       }
       .ticket-front {
         transform: rotateY(0deg);
@@ -824,7 +819,6 @@
         transform: rotateY(180deg);
       }
 
-      /* FIXED IMAGE FIT - No cropping, mathematical fit */
       .ticket-face img {
         max-width: 100%;
         max-height: 100%;
@@ -952,7 +946,7 @@
       }
 
       /* =========================================
-         UPGRADED PLAY PROMO BUTTON (FLAT / NO GLOW)
+         UPGRADED PLAY PROMO BUTTON
          ========================================= */
       #play-promo-btn {
         position: fixed;
@@ -968,7 +962,6 @@
         align-items: center;
         cursor: pointer;
         z-index: 160;
-        /* REMOVED BOX SHADOW TO ELIMINATE GLOW */
         transition:
           transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
           background-color 0.3s;
@@ -1049,6 +1042,30 @@
          MOBILE RESPONSIVE TWEAKS 
          ========================================= */
       @media (max-width: 768px) {
+        #loader-counter {
+          bottom: 5vh;
+          right: 5vw;
+          font-size: 18vw;
+        }
+
+        .mega-text-container {
+          margin-top: 0vh;
+        }
+        .letter-mask {
+          font-size: 24vw;
+        }
+        .hero-blurb {
+          bottom: 8vh;
+          font-size: 0.7rem;
+        }
+
+        .shifted-content-wrapper {
+          margin-top: -10vh;
+        }
+        #moon-zone {
+          margin-top: -10vh;
+        }
+
         .scroll-indicator {
           right: 5vw;
           font-size: 0.7rem;
@@ -1107,7 +1124,7 @@
         }
 
         .activities {
-          padding: 2vh 5% 10vh 5%;
+          padding: 2vh 5% 5vh 5%;
         }
         .grid {
           display: flex;
@@ -1195,7 +1212,6 @@
           width: 110vw;
         }
 
-        /* PERFECT MOBILE FIT FOR TICKET */
         .ticket-container {
           width: 95vw;
           height: 80vh;
@@ -1280,9 +1296,7 @@
         telescopic observations, immersive stargazing expeditions, and hands-on
         astrophotography workshops.
       </div>
-      <div class="mega-hero-logo">
-        <img src="images/l2.png" alt="AstroMates Logo" />
-      </div>
+
       <div class="mega-text-container">
         <div class="mega-word">
           <span class="letter-mask bg-l1">A</span
@@ -1387,7 +1401,7 @@
       </div>
     </section>
 
-    <!-- 5. CONTACT ZONE (EDGE TO EDGE & GSAP REVEAL) -->
+    <!-- 5. CONTACT ZONE -->
     <section class="contact-zone" id="contact-zone">
       <div class="contact-box">
         <div class="contact-content">
@@ -1416,32 +1430,21 @@
               >Neel Vankudre & Rounak Deshpande</span
             >
           </div>
-          <!-- White square box for logo -->
-          <img
-            src="images/logo.png"
-            alt="AstroMates Logo"
-            class="contact-logo"
-          />
         </div>
 
-        <!-- CONTINUOUS NEWS TICKER -->
         <div class="ticker-wrap">
           <div class="ticker-move">
             <div class="ticker-item">
               Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
-              &nbsp;|&nbsp;
+              &nbsp;|&nbsp; Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur
+              &nbsp;|&nbsp; Rounak &nbsp;|&nbsp; Neel &nbsp;|&nbsp; ©
+              AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak &nbsp;|&nbsp;
             </div>
             <div class="ticker-item">
               Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
-              &nbsp;|&nbsp;
-            </div>
-            <div class="ticker-item">
-              Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
-              &nbsp;|&nbsp;
-            </div>
-            <div class="ticker-item">
-              Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
-              &nbsp;|&nbsp;
+              &nbsp;|&nbsp; Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur
+              &nbsp;|&nbsp; Rounak &nbsp;|&nbsp; Neel &nbsp;|&nbsp; ©
+              AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak &nbsp;|&nbsp;
             </div>
           </div>
         </div>
@@ -1455,6 +1458,48 @@
 
     <script>
       // ==========================================
+      // FIX 2: AUTO-FULLSCREEN (SAFE FOR iPHONE)
+      // ==========================================
+      function requestFullScreen() {
+        const doc = window.document;
+        const docEl = doc.documentElement;
+
+        const isIOS =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+        if (!isIOS) {
+          const requestFullScreen =
+            docEl.requestFullscreen ||
+            docEl.mozRequestFullScreen ||
+            docEl.webkitRequestFullScreen ||
+            docEl.msRequestFullscreen;
+
+          if (
+            requestFullScreen &&
+            !doc.fullscreenElement &&
+            !doc.mozFullScreenElement &&
+            !doc.webkitFullscreenElement &&
+            !doc.msFullscreenElement
+          ) {
+            try {
+              requestFullScreen.call(docEl).catch((err) => {
+                console.warn(`Fullscreen error: ${err.message}`);
+              });
+            } catch (e) {
+              console.warn("Fullscreen API not supported");
+            }
+          }
+        }
+
+        document.removeEventListener("click", requestFullScreen);
+        document.removeEventListener("touchstart", requestFullScreen);
+      }
+
+      document.addEventListener("click", requestFullScreen);
+      document.addEventListener("touchstart", requestFullScreen);
+
+      // ==========================================
       // LOADER SCRIPT EXECUTION
       // ==========================================
       const loaderOverlay = document.getElementById("loader-overlay");
@@ -1466,8 +1511,8 @@
 
       gsap.to(loadData, {
         percent: 100,
-        duration: 1.5,
-        ease: "power3.inOut",
+        duration: 1.2,
+        ease: "power2.inOut",
         onUpdate: function () {
           let currentPercent = Math.round(loadData.percent);
           loaderCounter.innerHTML = currentPercent;
@@ -1477,7 +1522,7 @@
           gsap.to(loaderOverlay, {
             yPercent: -100,
             opacity: 0,
-            duration: 0.8,
+            duration: 0.6,
             ease: "expo.inOut",
             onComplete: () => {
               loaderOverlay.style.display = "none";
@@ -1769,7 +1814,7 @@
           trigger: "body",
           start: "top top",
           end: "bottom bottom",
-          scrub: 1.5,
+          scrub: 1,
         },
       });
       floatTl
@@ -1810,6 +1855,7 @@
           duration: 1,
         });
 
+      // FIX 1: Added anticipatePin: 1 and changed scrub to 1
       let mm = gsap.matchMedia();
       mm.add("(min-width: 769px)", () => {
         const teleTl = gsap.timeline({
@@ -1817,8 +1863,9 @@
             trigger: "#telescope-zone",
             start: "top top",
             end: "+=30%",
-            scrub: 1.5,
+            scrub: 1,
             pin: true,
+            anticipatePin: 1,
             onUpdate: (self) => {
               isCinematicMode = self.progress > 0.02 && self.progress < 0.98;
             },
@@ -1864,11 +1911,11 @@
             trigger: "#moon-zone",
             start: "top top",
             end: "+=60%",
-            scrub: 1.5,
+            scrub: 1,
             pin: true,
+            anticipatePin: 1,
           },
         });
-        moonTl.to(".moon-catch-wrapper", { opacity: 1, duration: 0.1 }, 0);
         moonTl.fromTo(
           ".moon-img",
           { y: "-100vh", xPercent: -50, rotationZ: -90 },
@@ -1879,7 +1926,7 @@
             duration: 4,
             ease: "power1.inOut",
           },
-          0.5,
+          0,
         );
         moonTl.fromTo(
           ".left-hand",
@@ -1891,7 +1938,7 @@
             duration: 3,
             ease: "power2.out",
           },
-          0.5,
+          0,
         );
         moonTl.fromTo(
           ".right-hand",
@@ -1903,7 +1950,7 @@
             duration: 3,
             ease: "power2.out",
           },
-          0.5,
+          0,
         );
         moonTl.to({}, { duration: 2 });
       });
@@ -1914,8 +1961,9 @@
             trigger: "#telescope-zone",
             start: "top top",
             end: "+=30%",
-            scrub: 1.5,
+            scrub: 1,
             pin: true,
+            anticipatePin: 1,
             onUpdate: (self) => {
               isCinematicMode = self.progress > 0.02 && self.progress < 0.98;
             },
@@ -1966,15 +2014,11 @@
             trigger: "#moon-zone",
             start: "top top",
             end: "+=60%",
-            scrub: 1.5,
+            scrub: 1,
             pin: true,
+            anticipatePin: 1,
           },
         });
-        moonTlMobile.to(
-          ".moon-catch-wrapper",
-          { opacity: 1, duration: 0.1 },
-          0,
-        );
         moonTlMobile.fromTo(
           ".moon-img",
           { y: "-100vh", xPercent: -50, rotationZ: -90 },
@@ -1985,7 +2029,7 @@
             duration: 4,
             ease: "power1.inOut",
           },
-          0.5,
+          0,
         );
         moonTlMobile.fromTo(
           ".left-hand",
@@ -1997,7 +2041,7 @@
             duration: 3,
             ease: "power2.out",
           },
-          0.5,
+          0,
         );
         moonTlMobile.fromTo(
           ".right-hand",
@@ -2009,7 +2053,7 @@
             duration: 3,
             ease: "power2.out",
           },
-          0.5,
+          0,
         );
         moonTlMobile.to({}, { duration: 2 });
       });
@@ -2050,7 +2094,7 @@
         },
       );
 
-      // CONTACT BOX GSAP ANIMATION (Fade and slide up)
+      // CONTACT BOX GSAP ANIMATION
       gsap.fromTo(
         ".contact-box",
         { y: 100, opacity: 0 },
@@ -2079,7 +2123,6 @@
         promoOverlay.style.pointerEvents = "auto";
         promoVideo.play();
 
-        // AUTO SHOW TEXT FOR 2 SECONDS WITHOUT TOUCHING SCREEN
         promoText.style.opacity = "1";
         clearTimeout(promoHideTimer);
         promoHideTimer = setTimeout(() => {
@@ -2184,7 +2227,7 @@
       const maxImg = document.getElementById("maximized-img");
 
       let targetCarouselRot = 0,
-        baseAutoSpeed = -0.15,
+        baseAutoSpeed = -0.04,
         mouseInfluence = 0,
         isModalOpen = false,
         carouselRadius = 0;
@@ -2192,13 +2235,13 @@
       window.addEventListener("mousemove", (e) => {
         if (!isModalOpen) return;
         let normalizedX = (e.clientX / window.innerWidth) * 2 - 1;
-        mouseInfluence = normalizedX * 1.5;
+        mouseInfluence = normalizedX * 0.5;
       });
 
       window.addEventListener("touchmove", (e) => {
         if (!isModalOpen) return;
         let normalizedX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
-        mouseInfluence = normalizedX * 2.5;
+        mouseInfluence = normalizedX * 1.0;
       });
 
       function renderCarousel() {

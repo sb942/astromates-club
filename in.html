@@ -1,0 +1,2310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AstroMates Club | Brutalist Space</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@500;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+      /* CSS VARIABLES */
+      :root {
+        --bg-dark: #050505;
+        --accent: #ff3300;
+        --text-main: #ffffff;
+        --font-display: "Archivo Black", sans-serif;
+        --font-body: "Inter", sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        font-family: var(--font-body);
+        overflow-x: hidden;
+        width: 100%;
+        -webkit-font-smoothing: antialiased;
+        user-select: none;
+        -webkit-user-select: none;
+        cursor: default;
+      }
+
+      img {
+        -webkit-user-drag: none;
+      }
+
+      ::selection {
+        background: transparent;
+      }
+
+      /* =========================================
+         FAST LOADER SCREEN (WHITE BG)
+         ========================================= */
+      #loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #ffffff;
+        z-index: 999999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .loader-line-wrapper {
+        width: 70vw;
+        max-width: 800px;
+        height: 25px;
+        background-image: repeating-linear-gradient(
+          to right,
+          rgba(255, 51, 0, 0.1) 0,
+          rgba(255, 51, 0, 0.1) 6px,
+          transparent 6px,
+          transparent 12px
+        );
+      }
+
+      .loader-line-progress {
+        width: 0%;
+        height: 100%;
+        background-image: repeating-linear-gradient(
+          to right,
+          var(--accent) 0,
+          var(--accent) 6px,
+          transparent 6px,
+          transparent 12px
+        );
+      }
+
+      #loader-counter {
+        position: absolute;
+        bottom: 2vh;
+        right: 4vw;
+        font-family: var(--font-display);
+        font-size: clamp(5rem, 15vw, 12rem);
+        color: #111111;
+        line-height: 0.8;
+        letter-spacing: -2px;
+      }
+
+      /* --- LAYER 1: WHITE BACKDROP --- */
+      #white-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #ffffff;
+        z-index: -2;
+        opacity: 1;
+        pointer-events: none;
+        will-change: opacity;
+      }
+
+      /* --- LAYER 2: 3D CANVAS --- */
+      #webgl-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      /* --- LAYER 3: TRANSITION FLASH --- */
+      #flash-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #ffffff;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      /* --- START SCREEN: MEGA HERO --- */
+      .mega-hero {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        z-index: 150;
+        pointer-events: none;
+      }
+
+      .mega-hero-logo {
+        position: absolute;
+        top: 4vh;
+        z-index: 160;
+      }
+
+      .mega-hero-logo img {
+        width: 80px;
+        filter: drop-shadow(0 0 15px rgba(255, 51, 0, 0.4));
+      }
+
+      .mega-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        margin-top: 5vh;
+      }
+
+      .mega-word {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .letter-mask {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 27vw;
+        line-height: 0.72;
+        letter-spacing: -0.04em;
+        color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+        background-size: 250% 250%;
+        background-repeat: no-repeat;
+        background-position: 0% 50%;
+      }
+
+      .bg-l1 {
+        background-image: url("images/s1.jpg");
+      }
+      .bg-l2 {
+        background-image: url("images/e1.jpg");
+      }
+      .bg-l3 {
+        background-image: url("images/m3.JPG");
+      }
+      .bg-l4 {
+        background-image: url("images/e7.jpg");
+      }
+      .bg-l5 {
+        background-image: url("images/e5.jpg");
+      }
+      .bg-l6 {
+        background-image: url("images/s4.JPG");
+      }
+      .bg-l7 {
+        background-image: url("images/t6.jpg");
+      }
+      .bg-l8 {
+        background-image: url("images/e6.jpg");
+      }
+      .bg-l9 {
+        background-image: url("images/m2.jpg");
+      }
+      .bg-l10 {
+        background-image: url("images/s10.jpg");
+      }
+
+      .hero-blurb {
+        position: absolute;
+        bottom: 2vh;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 95%;
+        max-width: 1100px;
+        text-align: center;
+        font-family: var(--font-body);
+        font-size: 0.75rem;
+        color: gold;
+        z-index: 160;
+        line-height: 1.4;
+      }
+
+      @media (min-width: 769px) {
+        .hero-blurb {
+          font-size: 0.85rem;
+          bottom: 3vh;
+        }
+      }
+
+      .scroll-indicator {
+        position: absolute;
+        bottom: 12vh;
+        right: 4vw;
+        font-family: var(--font-body);
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: #111;
+        letter-spacing: 0.2em;
+        writing-mode: vertical-rl;
+        z-index: 160;
+        opacity: 0.6;
+        animation: bob 2s ease-in-out infinite;
+      }
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(15px);
+        }
+      }
+
+      /* --- 3D STAMP SYSTEM --- */
+      .stamp-floater {
+        position: fixed;
+        top: 35vh;
+        left: 8vw;
+        z-index: 100;
+        pointer-events: none;
+      }
+
+      .stamp-wrapper {
+        width: 150px;
+        height: 215px;
+        perspective: 1200px;
+        cursor: grab;
+        pointer-events: auto;
+        touch-action: none;
+      }
+
+      .stamp-3d {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        box-shadow: 0 30px 50px rgba(0, 0, 0, 0.25);
+      }
+
+      .stamp-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        background: transparent;
+      }
+
+      .stamp-front {
+        transform: rotateY(0deg);
+      }
+      .stamp-back {
+        transform: rotateY(180deg);
+      }
+
+      .stamp-face img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+      }
+
+      .stamp-wrapper:active {
+        cursor: grabbing;
+      }
+
+      /* --- THE TWO SEPARATED ZONES --- */
+      .telescope-zone,
+      .moon-zone {
+        height: 100vh;
+        width: 100vw;
+        position: relative;
+        z-index: 15;
+        overflow: hidden;
+        background: transparent;
+      }
+
+      .moon-catch-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100%;
+        opacity: 0;
+        pointer-events: none;
+        will-change: opacity;
+      }
+
+      .moon-img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        height: 65vh;
+        width: auto;
+        margin-top: -32.5vh;
+        z-index: 11;
+        will-change: transform;
+      }
+
+      .left-hand {
+        position: absolute;
+        top: 50%;
+        left: -10vw;
+        height: 90vh;
+        width: auto;
+        margin-top: -50vh;
+        z-index: 12;
+        transform-origin: top left;
+        will-change: transform;
+      }
+
+      .right-hand {
+        position: absolute;
+        bottom: -5vh;
+        right: -10vw;
+        height: 90vh;
+        width: auto;
+        z-index: 13;
+        transform-origin: bottom right;
+        will-change: transform;
+      }
+
+      /* --- REST OF THE SITE --- */
+      .shifted-content-wrapper {
+        background-color: var(--bg-dark);
+        position: relative;
+        z-index: 20;
+      }
+
+      .air-layout-container {
+        padding: 0 5% 2vh 5%;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+        overflow: hidden;
+      }
+      .air-row {
+        border-bottom: 8px solid var(--accent);
+        padding: 1rem 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        opacity: 0;
+      }
+      .air-row:first-child {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      .air-text {
+        font-family: var(--font-display);
+        font-size: clamp(3rem, 10vw, 10rem);
+        line-height: 0.85;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        margin: 0;
+        word-wrap: break-word;
+        will-change: transform, opacity, filter;
+      }
+      .air-text.white {
+        color: #fff;
+      }
+
+      .air-box-container {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+      .air-sub-box {
+        border: 4px solid var(--accent);
+        padding: 1rem 2rem;
+        font-family: var(--font-display);
+        font-size: clamp(1.5rem, 4vw, 4rem);
+        color: var(--accent);
+        line-height: 0.9;
+      }
+      .air-sub-box.small {
+        font-family: var(--font-body);
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        border: none;
+        border-left: 6px solid var(--accent);
+        padding: 0.5rem 0 0 1rem;
+        color: #fff;
+        line-height: 1.1;
+      }
+
+      .tap-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        color: var(--accent);
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 5vw, 4rem);
+        margin-top: 3rem;
+        opacity: 0;
+      }
+      .tap-indicator .arrow {
+        animation: pulseDown 1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+      }
+      @keyframes pulseDown {
+        0% {
+          transform: translateY(0);
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(15px);
+          opacity: 1;
+        }
+      }
+
+      .activities {
+        padding: 5vh 5% 10vh 5%;
+        max-width: 1600px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 4rem;
+      }
+
+      .mobile-num {
+        display: none;
+      }
+
+      /* --- ACTIVITY BUTTON CARDS --- */
+      .card {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        opacity: 0;
+        cursor: pointer;
+        padding: 2rem;
+        border: 2px solid var(--accent);
+        border-radius: 12px;
+        background: transparent;
+        transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        position: relative;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .card-left {
+        font-family: var(--font-body);
+        font-weight: 800;
+        font-size: 0.9rem;
+        color: var(--accent);
+        width: 80px;
+        flex-shrink: 0;
+        border-top: 3px solid var(--accent);
+        padding-top: 0.5rem;
+        transition: all 0.4s ease;
+        z-index: 2;
+      }
+
+      .card-right h3 {
+        font-family: var(--font-display);
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
+        line-height: 0.85;
+        margin-bottom: 1rem;
+        color: var(--accent);
+        transition:
+          color 0.4s ease,
+          transform 0.4s ease;
+        word-break: break-word;
+        white-space: normal;
+      }
+      .card-right p {
+        font-family: var(--font-body);
+        line-height: 1.5;
+        font-size: 1.1rem;
+        color: rgba(255, 51, 0, 0.7);
+        transition: color 0.4s ease;
+      }
+
+      .card[data-category="stargazing"]:hover {
+        background: #0a192f;
+        border-color: #fff;
+        transform: translateY(-8px) scale(1.02);
+      }
+      .card[data-category="equipment"]:hover {
+        background: #1f2937;
+        border-color: #fff;
+        transform: translateY(-8px) scale(1.02);
+      }
+      .card[data-category="workshops"]:hover {
+        background: #2d1b2e;
+        border-color: #fff;
+        transform: translateY(-8px) scale(1.02);
+      }
+
+      .card:hover .card-right h3,
+      .card:hover .card-left,
+      .card:hover .card-right p {
+        color: #fff;
+      }
+      .card:hover .card-left {
+        border-color: #fff;
+      }
+
+      .card:active {
+        transform: scale(0.96) translateY(0);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+      }
+
+      /* =========================================
+         NEW CONTACT ZONE (EDGE TO EDGE)
+         ========================================= */
+      .contact-zone {
+        padding: 5vh 0 0 0;
+        position: relative;
+        z-index: 20;
+        background: transparent;
+      }
+      .contact-box {
+        background: transparent;
+        border-top: 4px solid var(--accent);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: stretch;
+        overflow: hidden;
+        position: relative;
+        width: 100vw;
+        margin: 0;
+        padding-bottom: 40px;
+      }
+      .contact-content {
+        padding: 3rem 5%;
+        color: var(--accent);
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .contact-content h2 {
+        font-family: var(--font-display);
+        font-size: clamp(3rem, 6vw, 5rem);
+        line-height: 1;
+        margin-bottom: 1rem;
+        color: #fff;
+      }
+      .book-text {
+        font-family: var(--font-body);
+        font-weight: 800;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+      }
+      .phone-numbers p {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+        color: #aaa;
+        font-family: var(--font-body);
+        font-weight: 500;
+      }
+      .phone-numbers span {
+        color: var(--accent);
+        font-weight: 800;
+      }
+
+      .contact-buttons-wrapper {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
+
+      .stylish-btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        background: transparent;
+        color: var(--accent);
+        border: 2px solid var(--accent);
+        font-family: var(--font-display);
+        text-decoration: none;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .stylish-btn:hover {
+        background: var(--accent);
+        color: #000;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(255, 51, 0, 0.3);
+      }
+      .stylish-btn:active {
+        transform: scale(0.96) translateY(0);
+      }
+
+      .contact-visuals {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+        padding: 2.5rem 5%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .cofounder-img-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 380px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      .cofounder-img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .cofounder-names {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: transparent;
+        color: #fff;
+        padding: 2px 4px;
+        font-size: 0.6rem;
+        font-family: var(--font-display);
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      }
+
+      .contact-logo {
+        width: 60px;
+        height: 60px;
+        margin-top: 1.5rem;
+        background-color: #fff;
+        border-radius: 0;
+        object-fit: contain;
+        padding: 5px;
+      }
+
+      /* CONTINUOUS TICKER STRIP */
+      .ticker-wrap {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        background-color: #000;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        border-top: 1px solid rgba(255, 51, 0, 0.3);
+      }
+      .ticker-move {
+        display: flex;
+        width: 200%;
+        animation: ticker 10s linear infinite;
+      }
+      .ticker-item {
+        width: 50%;
+        flex-shrink: 0;
+        color: #fff;
+        font-family: var(--font-display);
+        font-size: 0.85rem;
+        text-align: center;
+        white-space: nowrap;
+        letter-spacing: 2px;
+      }
+      @keyframes ticker {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+
+      .final-copyright {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.9rem;
+        margin: 2rem 0;
+        font-family: var(--font-body);
+        font-weight: 500;
+      }
+
+      /* =========================================
+         UPCOMING EVENTS TICKET VIEWER MODAL
+         ========================================= */
+      #ticket-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(5, 5, 5, 0.95);
+        backdrop-filter: blur(20px);
+        z-index: 3000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+      }
+      #ticket-modal.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      #close-ticket-btn {
+        position: absolute;
+        top: 30px;
+        right: 40px;
+        color: var(--accent);
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 3001;
+        transition: color 0.3s;
+      }
+      #close-ticket-btn:hover {
+        color: #fff;
+      }
+
+      .ticket-container {
+        perspective: 1200px;
+        width: 90vw;
+        max-width: 800px;
+        height: 80vh; /* Giving plenty of room for natural size */
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .ticket-3d {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .ticket-3d.flipped {
+        transform: rotateY(180deg);
+      }
+      .ticket-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent; /* Remove background constraints */
+      }
+      .ticket-front {
+        transform: rotateY(0deg);
+      }
+      .ticket-back {
+        transform: rotateY(180deg);
+      }
+
+      /* FIXED IMAGE FIT - No cropping, mathematical fit */
+      .ticket-face img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+      }
+
+      /* --- GALLERY MODAL --- */
+      .gallery-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(5, 5, 5, 0.98);
+        backdrop-filter: blur(15px);
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .gallery-modal.active {
+        pointer-events: auto;
+      }
+      .close-btn {
+        position: absolute;
+        top: 5vh;
+        right: 5vw;
+        font-family: var(--font-display);
+        color: var(--accent);
+        font-size: 2rem;
+        cursor: pointer;
+        z-index: 201;
+        transition: color 0.3s ease;
+      }
+      .close-btn:hover {
+        color: #fff;
+      }
+      #carousel-scene {
+        perspective: 1000px;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      #carousel-spinner {
+        width: 140px;
+        height: 300px;
+        position: relative;
+        transform-style: preserve-3d;
+      }
+      .carousel-item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        background: #000;
+        border: none;
+        cursor: pointer;
+        transition: filter 0.3s ease;
+        filter: brightness(0.7);
+      }
+      .carousel-item:hover {
+        filter: brightness(1.1);
+      }
+      .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        pointer-events: none;
+      }
+
+      /* Maximized Image Overlay */
+      #maximized-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 250;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        backdrop-filter: blur(10px);
+        cursor: zoom-out;
+      }
+      #maximized-img {
+        max-width: 90vw;
+        max-height: 90vh;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+        will-change: transform;
+      }
+
+      /* --- FOOTER --- */
+      footer {
+        padding: 5rem 5% 2rem 5%;
+        border-top: 16px solid var(--accent);
+        background: rgba(5, 5, 5, 0.9);
+        backdrop-filter: blur(10px);
+        position: relative;
+        z-index: 10;
+        cursor: pointer;
+      }
+      footer h2 {
+        font-family: var(--font-display);
+        font-size: clamp(4rem, 14vw, 16rem);
+        line-height: 0.8;
+        color: #fff;
+        word-wrap: break-word;
+        transition: color 0.3s ease;
+      }
+      footer:hover h2 {
+        color: var(--accent);
+      }
+
+      /* =========================================
+         UPGRADED PLAY PROMO BUTTON (FLAT / NO GLOW)
+         ========================================= */
+      #play-promo-btn {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #ff0000;
+        color: #ffffff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 160;
+        /* REMOVED BOX SHADOW TO ELIMINATE GLOW */
+        transition:
+          transform 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+          background-color 0.3s;
+      }
+      #play-promo-btn svg {
+        width: 25px;
+        height: 25px;
+        margin-left: 4px;
+      }
+      #play-promo-btn:hover {
+        transform: scale(1.1) translateY(-5px);
+        background-color: #fff;
+        color: #ff0000;
+      }
+
+      #video-overlay-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        overflow: hidden;
+        transition: opacity 0.4s ease-in-out;
+      }
+      #close-promo-btn {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        color: #fff;
+        font-size: 2.5rem;
+        cursor: pointer;
+        z-index: 10000;
+        line-height: 1;
+        transition:
+          color 0.3s ease,
+          transform 0.3s ease;
+      }
+      #close-promo-btn:hover {
+        color: var(--accent);
+        transform: scale(1.1) rotate(90deg);
+      }
+      #promo-bg-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 130vw;
+        height: 130vh;
+        object-fit: cover;
+        transform: translate(-50%, -50%) scale(1.2);
+        z-index: 1;
+      }
+      #promo-text-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #bd0000;
+        font-family: "Archivo Black", Impact, sans-serif;
+        font-size: 12vw;
+        font-weight: 900;
+        font-style: italic;
+        text-align: center;
+        line-height: 0.85;
+        letter-spacing: -2px;
+        text-transform: uppercase;
+        width: 100%;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      /* =========================================
+         MOBILE RESPONSIVE TWEAKS 
+         ========================================= */
+      @media (max-width: 768px) {
+        .scroll-indicator {
+          right: 5vw;
+          font-size: 0.7rem;
+          bottom: 8vh;
+        }
+        .stamp-wrapper {
+          width: 80px;
+          height: 114px;
+        }
+        #play-promo-btn {
+          width: 50px;
+          height: 50px;
+          bottom: 20px;
+          left: 20px;
+        }
+        #play-promo-btn svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .air-layout-container {
+          display: flex;
+          flex-wrap: wrap;
+          flex-direction: row;
+          align-items: center;
+          gap: 1.5vw 2vw;
+          padding: 2vh 5%;
+        }
+        .air-row {
+          display: inline-block;
+          border: none !important;
+          padding: 0 !important;
+        }
+        .air-text {
+          font-size: 8vw;
+          display: inline-block;
+          line-height: 0.9;
+        }
+        .air-box-container {
+          display: inline-flex;
+          gap: 2vw;
+          margin-top: 0;
+          align-items: center;
+        }
+        .air-sub-box {
+          font-size: 6vw;
+          padding: 1vw 2vw;
+          border-width: 2px;
+          display: inline-block;
+        }
+        .air-sub-box.small {
+          font-size: 3vw;
+          padding: 0 0 0 1vw;
+          border-left: 2px solid var(--accent);
+          display: inline-block;
+        }
+
+        .activities {
+          padding: 2vh 5% 10vh 5%;
+        }
+        .grid {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+        .card {
+          padding: 1.5rem !important;
+          border: 2px solid var(--accent) !important;
+          border-radius: 8px !important;
+          background: transparent !important;
+        }
+        .card-left,
+        .card-right p {
+          display: none;
+        }
+        .card-right h3 {
+          font-size: 8vw;
+          line-height: 0.85;
+          margin: 0;
+          color: var(--accent);
+          text-shadow: none;
+          transform: none;
+          position: relative;
+          display: inline-block;
+          letter-spacing: -0.02em;
+          white-space: normal;
+          word-break: break-word;
+        }
+
+        .card[data-category="stargazing"]:active {
+          background: #0a192f !important;
+          border-color: #fff !important;
+        }
+        .card[data-category="equipment"]:active {
+          background: #1f2937 !important;
+          border-color: #fff !important;
+        }
+        .card[data-category="workshops"]:active {
+          background: #2d1b2e !important;
+          border-color: #fff !important;
+        }
+        .card:active .card-right h3 {
+          color: #fff;
+          transform: none;
+        }
+
+        .contact-box {
+          flex-direction: column;
+        }
+        .contact-visuals {
+          align-items: center;
+          padding: 2rem 5%;
+        }
+        .cofounder-img-wrap {
+          max-width: 100%;
+        }
+
+        .contact-buttons-wrapper {
+          flex-direction: column;
+          width: 100%;
+          gap: 10px;
+        }
+        .stylish-btn {
+          text-align: center;
+          width: 100%;
+        }
+
+        #carousel-spinner {
+          width: 80px;
+          height: 180px;
+        }
+        .moon-img {
+          height: auto;
+          width: 75vw;
+          margin-top: -42.5vw;
+        }
+        .left-hand {
+          height: auto;
+          width: 110vw;
+          margin-top: -40vw;
+        }
+        .right-hand {
+          height: auto;
+          width: 110vw;
+        }
+
+        /* PERFECT MOBILE FIT FOR TICKET */
+        .ticket-container {
+          width: 95vw;
+          height: 80vh;
+        }
+        .ticket-face img {
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- FAST LOADER OVERLAY -->
+    <div id="loader-overlay">
+      <div class="loader-line-wrapper">
+        <div class="loader-line-progress" id="loader-progress-bar"></div>
+      </div>
+      <div id="loader-counter">0</div>
+    </div>
+
+    <!-- TICKET VIEWER MODAL -->
+    <div id="ticket-modal">
+      <div id="close-ticket-btn">CLOSE [X]</div>
+      <div class="ticket-container" id="ticket-flipper">
+        <div class="ticket-3d">
+          <div class="ticket-face ticket-front">
+            <img src="images/tt1.png" alt="Event Ticket Front" />
+          </div>
+          <div class="ticket-face ticket-back">
+            <img src="images/tt2.png" alt="Event Ticket Back" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="white-backdrop"></div>
+    <div id="webgl-container"></div>
+    <div id="flash-overlay"></div>
+
+    <!-- UPGRADED PLAY PROMO BUTTON -->
+    <div id="play-promo-btn" title="Play Promo Video">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    </div>
+
+    <!-- VIDEO PROMO OVERLAY -->
+    <div id="video-overlay-wrapper">
+      <div id="close-promo-btn">✖</div>
+      <video id="promo-bg-video" src="r.mp4" loop muted playsinline></video>
+      <div id="promo-text-overlay">
+        ASTROMATES <br />
+        ONE STEP <br />
+        CLOSER TO SOME <br />
+        SPACE!!
+      </div>
+    </div>
+
+    <!-- 3D CONTINUOUS CIRCLE MODAL -->
+    <div id="gallery-modal" class="gallery-modal">
+      <div class="close-btn" id="close-gallery">CLOSE [X]</div>
+      <div id="carousel-scene">
+        <div id="carousel-spinner"></div>
+      </div>
+    </div>
+
+    <!-- MAXIMIZED OVERLAY -->
+    <div id="maximized-overlay">
+      <img id="maximized-img" src="" alt="Maximized view" />
+    </div>
+
+    <!-- 1. START SCREEN: MEGA HERO -->
+    <section class="mega-hero">
+      <div class="scroll-indicator">SCROLL</div>
+      <div class="hero-blurb">
+        AstroMates Club is Kolhapur’s first public astronomy community,
+        dedicated to bringing the wonders of the cosmos down to Earth. We bridge
+        the gap between curiosity and the deep sky through professional
+        telescopic observations, immersive stargazing expeditions, and hands-on
+        astrophotography workshops.
+      </div>
+      <div class="mega-hero-logo">
+        <img src="images/l2.png" alt="AstroMates Logo" />
+      </div>
+      <div class="mega-text-container">
+        <div class="mega-word">
+          <span class="letter-mask bg-l1">A</span
+          ><span class="letter-mask bg-l2">S</span
+          ><span class="letter-mask bg-l3">T</span
+          ><span class="letter-mask bg-l4">R</span
+          ><span class="letter-mask bg-l5">O</span>
+        </div>
+        <div class="mega-word">
+          <span class="letter-mask bg-l6">M</span
+          ><span class="letter-mask bg-l7">A</span
+          ><span class="letter-mask bg-l8">T</span
+          ><span class="letter-mask bg-l9">E</span
+          ><span class="letter-mask bg-l10">S</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLOATING STAMP ELEMENT -->
+    <div class="stamp-floater" id="stamp-tracker">
+      <div class="stamp-wrapper" id="interactive-stamp">
+        <div class="stamp-3d">
+          <div class="stamp-face stamp-front">
+            <img src="images/st1.png" alt="AMC Red Stamp" />
+          </div>
+          <div class="stamp-face stamp-back">
+            <img src="images/st2.png" alt="AMC Blue Stamp" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TELESCOPE TRANSITION ZONE -->
+    <section class="telescope-zone" id="telescope-zone"></section>
+
+    <!-- 3. AIR LAYOUT & ACTIVITIES -->
+    <div class="shifted-content-wrapper">
+      <section class="air-layout-container">
+        <div class="air-row"><h2 class="air-text">KOLHAPUR'S</h2></div>
+        <div class="air-row"><h2 class="air-text white">FIRST PUBLIC</h2></div>
+        <div class="air-row">
+          <div class="air-box-container">
+            <div class="air-sub-box">ASTRONOMY</div>
+            <div class="air-sub-box small">
+              BRIDGING<br />CURIOSITY &<br />THE DEEP SKY
+            </div>
+          </div>
+        </div>
+        <div class="air-row"><h2 class="air-text">COMMUNITY</h2></div>
+
+        <div class="air-row">
+          <div class="tap-indicator">
+            <span class="arrow">↓</span><span class="arrow">↓</span>
+            <span>TAP</span>
+            <span class="arrow">↓</span><span class="arrow">↓</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="activities">
+        <div class="grid">
+          <div class="card activity-card" data-category="stargazing">
+            <div class="card-left">EXPEDITIONS</div>
+            <div class="card-right">
+              <h3>STAR GAZING<span class="mobile-num">01</span></h3>
+              <p>
+                Guided tours of the constellations, meteor showers, and
+                celestial events.
+              </p>
+            </div>
+          </div>
+          <div class="card activity-card" data-category="equipment">
+            <div class="card-left">EQUIPMENT</div>
+            <div class="card-right">
+              <h3>EQUIPMENT<span class="mobile-num">02</span></h3>
+              <p>
+                High-powered motorized optics. See the rings of Saturn and
+                nebulae in breathtaking detail.
+              </p>
+            </div>
+          </div>
+          <div class="card activity-card" data-category="workshops">
+            <div class="card-left">WORKSHOPS</div>
+            <div class="card-right">
+              <h3>WORKSHOPS<span class="mobile-num">03</span></h3>
+              <p>
+                Equipment setup, long-exposure tracking, and post-processing the
+                night sky.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 4. MOON & HAND CATCH ZONE -->
+    <section class="moon-zone" id="moon-zone">
+      <div class="moon-catch-wrapper">
+        <img src="images/moon.png" alt="Moon" class="moon-img" />
+        <img src="images/llh.png" alt="Left Hand" class="left-hand" />
+        <img src="images/rrh.png" alt="Right Hand" class="right-hand" />
+      </div>
+    </section>
+
+    <!-- 5. CONTACT ZONE (EDGE TO EDGE & GSAP REVEAL) -->
+    <section class="contact-zone" id="contact-zone">
+      <div class="contact-box">
+        <div class="contact-content">
+          <h2>CONNECT</h2>
+          <p class="book-text">DM us to Book or Call us on:</p>
+          <div class="phone-numbers">
+            <p>Neel Vankudre : <span>94231 09378</span></p>
+            <p>Rounak Deshpande: <span>74989 59862</span></p>
+          </div>
+
+          <div class="contact-buttons-wrapper">
+            <a
+              href="https://www.instagram.com/astromatesclub/"
+              target="_blank"
+              class="stylish-btn"
+              >INSTAGRAM</a
+            >
+            <div class="stylish-btn" id="open-events-btn">UPCOMING EVENTS</div>
+          </div>
+        </div>
+
+        <div class="contact-visuals">
+          <div class="cofounder-img-wrap">
+            <img src="images/e12.jpg" alt="Cofounders" class="cofounder-img" />
+            <span class="cofounder-names"
+              >Neel Vankudre & Rounak Deshpande</span
+            >
+          </div>
+          <!-- White square box for logo -->
+          <img
+            src="images/logo.png"
+            alt="AstroMates Logo"
+            class="contact-logo"
+          />
+        </div>
+
+        <!-- CONTINUOUS NEWS TICKER -->
+        <div class="ticker-wrap">
+          <div class="ticker-move">
+            <div class="ticker-item">
+              Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
+              &nbsp;|&nbsp;
+            </div>
+            <div class="ticker-item">
+              Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
+              &nbsp;|&nbsp;
+            </div>
+            <div class="ticker-item">
+              Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
+              &nbsp;|&nbsp;
+            </div>
+            <div class="ticker-item">
+              Neel &nbsp;|&nbsp; © AstroMatesClub Kolhapur &nbsp;|&nbsp; Rounak
+              &nbsp;|&nbsp;
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="final-copyright">© AstroMatesClub Kolhapur</div>
+    </section>
+
+    <!-- 6. FOOTER -->
+    <footer id="footer-trigger"><h2>LOOK UP</h2></footer>
+
+    <script>
+      // ==========================================
+      // LOADER SCRIPT EXECUTION
+      // ==========================================
+      const loaderOverlay = document.getElementById("loader-overlay");
+      const loaderCounter = document.getElementById("loader-counter");
+      const loaderProgressBar = document.getElementById("loader-progress-bar");
+
+      document.body.style.overflow = "hidden";
+      let loadData = { percent: 0 };
+
+      gsap.to(loadData, {
+        percent: 100,
+        duration: 1.5,
+        ease: "power3.inOut",
+        onUpdate: function () {
+          let currentPercent = Math.round(loadData.percent);
+          loaderCounter.innerHTML = currentPercent;
+          loaderProgressBar.style.width = currentPercent + "%";
+        },
+        onComplete: function () {
+          gsap.to(loaderOverlay, {
+            yPercent: -100,
+            opacity: 0,
+            duration: 0.8,
+            ease: "expo.inOut",
+            onComplete: () => {
+              loaderOverlay.style.display = "none";
+              document.body.style.overflow = "auto";
+              document.body.style.overflowX = "hidden";
+            },
+          });
+        },
+      });
+
+      // --- THREE.JS SCENE SETUP ---
+      const container = document.getElementById("webgl-container");
+      const scene = new THREE.Scene();
+
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        3000,
+      );
+      camera.position.z = 0;
+      scene.add(camera);
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+      scene.add(ambientLight);
+      const pointLight = new THREE.PointLight(0x6a5acd, 4, 100);
+      pointLight.position.set(0, 2, 0);
+      camera.add(pointLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+      directionalLight.position.set(10, 20, 15);
+      scene.add(directionalLight);
+      const rimLight = new THREE.DirectionalLight(0xffffff, 3);
+      rimLight.position.set(-15, 5, -15);
+      scene.add(rimLight);
+
+      const starTexture = createStarTexture();
+      const starsGeometry = new THREE.BufferGeometry();
+      const posArray = new Float32Array(3000 * 3);
+      for (let i = 0; i < 9000; i += 3) {
+        posArray[i] = (Math.random() - 0.5) * 2000;
+        posArray[i + 1] = (Math.random() - 0.5) * 2000;
+        posArray[i + 2] = (Math.random() - 0.5) * 2000;
+      }
+      starsGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(posArray, 3),
+      );
+      const starsMaterial = new THREE.PointsMaterial({
+        size: 2,
+        color: 0xffffff,
+        map: starTexture,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const starMesh = new THREE.Points(starsGeometry, starsMaterial);
+      scene.add(starMesh);
+
+      const clusterGeometry = new THREE.BufferGeometry();
+      const clusterPos = new Float32Array(5000 * 3);
+      const clusterColors = new Float32Array(5000 * 3);
+      for (let i = 0; i < 15000; i += 3) {
+        const r = 250 * Math.cbrt(Math.random());
+        const theta = Math.random() * 2 * Math.PI;
+        const phi = Math.acos(2 * Math.random() - 1);
+        clusterPos[i] = r * Math.sin(phi) * Math.cos(theta);
+        clusterPos[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+        clusterPos[i + 2] = -1800 + r * Math.cos(phi);
+        clusterColors[i] = 0.4 + Math.random() * 0.2;
+        clusterColors[i + 1] = 0.3 + Math.random() * 0.2;
+        clusterColors[i + 2] = 0.8 + Math.random() * 0.2;
+      }
+      clusterGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(clusterPos, 3),
+      );
+      clusterGeometry.setAttribute(
+        "color",
+        new THREE.BufferAttribute(clusterColors, 3),
+      );
+      const clusterMat = new THREE.PointsMaterial({
+        size: 3,
+        vertexColors: true,
+        map: starTexture,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const clusterMesh = new THREE.Points(clusterGeometry, clusterMat);
+      scene.add(clusterMesh);
+
+      function createStarTexture() {
+        const canvas = document.createElement("canvas");
+        canvas.width = 16;
+        canvas.height = 16;
+        const ctx = canvas.getContext("2d");
+        const gradient = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
+        gradient.addColorStop(0, "rgba(255,255,255,1)");
+        gradient.addColorStop(0.2, "rgba(255,255,255,0.8)");
+        gradient.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 16, 16);
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      const telescopePivot = new THREE.Group();
+      const telescopeGroup = new THREE.Group();
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: 0x151515,
+        metalness: 0.9,
+        roughness: 0.2,
+        side: THREE.DoubleSide,
+      });
+      const matteBlackMat = new THREE.MeshStandardMaterial({
+        color: 0x050505,
+        metalness: 0.5,
+        roughness: 0.8,
+        side: THREE.DoubleSide,
+      });
+
+      const mainTube = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.2, 1.2, 8, 32),
+        bodyMat,
+      );
+      mainTube.rotation.x = Math.PI / 2;
+      telescopeGroup.add(mainTube);
+      const dewShield = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.3, 1.3, 3, 32),
+        matteBlackMat,
+      );
+      dewShield.position.z = -4.5;
+      dewShield.rotation.x = Math.PI / 2;
+      telescopeGroup.add(dewShield);
+      telescopeGroup.position.set(0, 1.4, -0.5);
+      telescopePivot.add(telescopeGroup);
+
+      const isMobileScreen = window.innerWidth <= 768;
+      if (isMobileScreen) {
+        telescopePivot.position.set(0, -1.5, -15);
+        telescopePivot.rotation.set(0.2, Math.PI / 2.5, 0);
+        telescopePivot.scale.set(0.5, 0.5, 0.5);
+      } else {
+        telescopePivot.position.set(10, -5, -25);
+      }
+      camera.add(telescopePivot);
+
+      let mouseX = 0,
+        mouseY = 0,
+        isCinematicMode = false;
+      const windowHalfX = window.innerWidth / 2,
+        windowHalfY = window.innerHeight / 2;
+      document.addEventListener("mousemove", (event) => {
+        mouseX = event.clientX - windowHalfX;
+        mouseY = event.clientY - windowHalfY;
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const time = clock.getElapsedTime();
+        starMesh.rotation.z = time * 0.02;
+        clusterMesh.rotation.y = time * 0.05;
+        starsMaterial.color.setHSL((time * 0.05) % 1, 0.9, 0.7);
+
+        if (!isCinematicMode) {
+          camera.rotation.y += 0.05 * (mouseX * 0.001 - camera.rotation.y);
+          camera.rotation.x += 0.05 * (mouseY * 0.001 - camera.rotation.x);
+          telescopePivot.rotation.y +=
+            0.05 * (mouseX * 0.002 - telescopePivot.rotation.y);
+          telescopePivot.rotation.x +=
+            0.05 * (mouseY * 0.002 - telescopePivot.rotation.x);
+          telescopePivot.position.y += Math.sin(time * 2) * 0.005;
+        }
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // ==========================================
+      // STAMP INTERACTION
+      // ==========================================
+      const stampTracker = document.getElementById("stamp-tracker");
+      const stampWrapper = document.getElementById("interactive-stamp");
+      const stamp3D = stampWrapper.querySelector(".stamp-3d");
+
+      let targetStampRotY = 0,
+        stampDragRotY = 0,
+        isDraggingStamp = false,
+        startMouseXStamp = 0;
+
+      gsap.to(stampWrapper, {
+        y: "-=25",
+        x: "+=15",
+        rotationZ: "+=3",
+        duration: 3.5,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+
+      stampWrapper.addEventListener("mouseenter", () => {
+        if (!isDraggingStamp)
+          gsap.to(stamp3D, {
+            rotateY: targetStampRotY + 180,
+            duration: 0.8,
+            ease: "power2.out",
+          });
+      });
+      stampWrapper.addEventListener("mouseleave", () => {
+        if (!isDraggingStamp)
+          gsap.to(stamp3D, {
+            rotateY: targetStampRotY,
+            duration: 0.8,
+            ease: "power2.out",
+          });
+      });
+      stampWrapper.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        isDraggingStamp = true;
+        startMouseXStamp = e.clientX;
+        stampDragRotY = targetStampRotY;
+        gsap.killTweensOf(stamp3D);
+      });
+      window.addEventListener("pointermove", (e) => {
+        if (!isDraggingStamp) return;
+        const deltaX = e.clientX - startMouseXStamp;
+        stampDragRotY = targetStampRotY + deltaX * 0.8;
+        gsap.to(stamp3D, {
+          rotateY: stampDragRotY,
+          duration: 0.1,
+          ease: "none",
+        });
+      });
+      window.addEventListener("pointerup", (e) => {
+        if (isDraggingStamp) {
+          isDraggingStamp = false;
+          const deltaX = Math.abs(e.clientX - startMouseXStamp);
+          if (deltaX < 10) targetStampRotY += 180;
+          else targetStampRotY = Math.round(stampDragRotY / 180) * 180;
+          gsap.to(stamp3D, {
+            rotateX: 0,
+            rotateY: targetStampRotY,
+            y: 0,
+            duration: 1,
+            ease: "elastic.out(1, 0.5)",
+          });
+        }
+      });
+
+      document
+        .getElementById("footer-trigger")
+        .addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+      // --- GSAP TIMELINES & SCROLL ANIMATIONS ---
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.fromTo(
+        ".letter-mask",
+        { backgroundPosition: "0% 50%" },
+        {
+          backgroundPosition: "100% 50%",
+          duration: 20,
+          ease: "none",
+          repeat: -1,
+          yoyo: true,
+          stagger: 0.15,
+        },
+      );
+
+      const floatTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1.5,
+        },
+      });
+      floatTl
+        .to(stampTracker, { x: "40vw", y: "5vh", rotation: 15, duration: 1 })
+        .to(stampTracker, {
+          x: "75vw",
+          y: "-15vh",
+          rotation: -10,
+          scale: 0.8,
+          duration: 1,
+        })
+        .to(stampTracker, {
+          x: "10vw",
+          y: "20vh",
+          rotation: 25,
+          scale: 1.1,
+          duration: 1,
+        })
+        .to(stampTracker, {
+          x: "70vw",
+          y: "35vh",
+          rotation: -5,
+          scale: 1,
+          duration: 1,
+        })
+        .to(stampTracker, {
+          x: "20vw",
+          y: "45vh",
+          rotation: 10,
+          scale: 0.9,
+          duration: 1,
+        })
+        .to(stampTracker, {
+          x: "60vw",
+          y: "30vh",
+          rotation: -15,
+          scale: 1,
+          duration: 1,
+        });
+
+      let mm = gsap.matchMedia();
+      mm.add("(min-width: 769px)", () => {
+        const teleTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#telescope-zone",
+            start: "top top",
+            end: "+=30%",
+            scrub: 1.5,
+            pin: true,
+            onUpdate: (self) => {
+              isCinematicMode = self.progress > 0.02 && self.progress < 0.98;
+            },
+          },
+        });
+        teleTl.to(
+          telescopePivot.position,
+          { x: 0, y: -1.5, z: -15, duration: 4, ease: "power2.inOut" },
+          0,
+        );
+        teleTl.to(
+          telescopePivot.rotation,
+          { x: 0, y: 0, z: 0, duration: 4, ease: "power2.inOut" },
+          0,
+        );
+        teleTl.to(
+          camera.rotation,
+          { x: 0, y: 0, z: 0, duration: 4, ease: "power2.inOut" },
+          0,
+        );
+        teleTl.to(
+          telescopePivot.position,
+          { z: 12, duration: 8, ease: "power1.inOut" },
+          4,
+        );
+        teleTl.to("#white-backdrop", { opacity: 0, duration: 4 }, 10);
+        teleTl.fromTo(
+          "#flash-overlay",
+          { opacity: 0 },
+          { opacity: 1, duration: 0.2, yoyo: true, repeat: 1 },
+          12,
+        );
+        teleTl.to(starsMaterial, { opacity: 0.8, duration: 0.1 }, 12.5);
+        teleTl.to(clusterMat, { opacity: 1, duration: 0.1 }, 12.5);
+        teleTl.to(
+          camera.position,
+          { z: -800, duration: 6, ease: "power2.out" },
+          12.5,
+        );
+
+        const moonTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#moon-zone",
+            start: "top top",
+            end: "+=60%",
+            scrub: 1.5,
+            pin: true,
+          },
+        });
+        moonTl.to(".moon-catch-wrapper", { opacity: 1, duration: 0.1 }, 0);
+        moonTl.fromTo(
+          ".moon-img",
+          { y: "-100vh", xPercent: -50, rotationZ: -90 },
+          {
+            y: "0vh",
+            xPercent: -50,
+            rotationZ: 0,
+            duration: 4,
+            ease: "power1.inOut",
+          },
+          0.5,
+        );
+        moonTl.fromTo(
+          ".left-hand",
+          { x: "-50vw", y: "5vh", rotationZ: 20 },
+          {
+            x: "12vw",
+            y: "-20vh",
+            rotationZ: 10,
+            duration: 3,
+            ease: "power2.out",
+          },
+          0.5,
+        );
+        moonTl.fromTo(
+          ".right-hand",
+          { x: "50vw", y: "-20vh", rotationZ: -20 },
+          {
+            x: "-2vw",
+            y: "-20vh",
+            rotationZ: -5,
+            duration: 3,
+            ease: "power2.out",
+          },
+          0.5,
+        );
+        moonTl.to({}, { duration: 2 });
+      });
+
+      mm.add("(max-width: 768px)", () => {
+        const teleTlMobile = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#telescope-zone",
+            start: "top top",
+            end: "+=30%",
+            scrub: 1.5,
+            pin: true,
+            onUpdate: (self) => {
+              isCinematicMode = self.progress > 0.02 && self.progress < 0.98;
+            },
+          },
+        });
+        teleTlMobile.to(
+          telescopePivot.position,
+          { x: 0, y: -1.5, z: -15, duration: 4, ease: "power2.inOut" },
+          0,
+        );
+        teleTlMobile.to(
+          telescopePivot.scale,
+          { x: 1, y: 1, z: 1, duration: 4, ease: "power2.inOut" },
+          0,
+        );
+        teleTlMobile.to(
+          telescopePivot.rotation,
+          { x: 0, y: 0, z: 0, duration: 4, ease: "power2.inOut" },
+          0,
+        );
+        teleTlMobile.to(
+          camera.rotation,
+          { x: 0, y: 0, z: 0, duration: 4, ease: "power2.inOut" },
+          0,
+        );
+        teleTlMobile.to(
+          telescopePivot.position,
+          { z: 12, duration: 8, ease: "power1.inOut" },
+          4,
+        );
+        teleTlMobile.to("#white-backdrop", { opacity: 0, duration: 4 }, 10);
+        teleTlMobile.fromTo(
+          "#flash-overlay",
+          { opacity: 0 },
+          { opacity: 1, duration: 0.2, yoyo: true, repeat: 1 },
+          12,
+        );
+        teleTlMobile.to(starsMaterial, { opacity: 0.8, duration: 0.1 }, 12.5);
+        teleTlMobile.to(clusterMat, { opacity: 1, duration: 0.1 }, 12.5);
+        teleTlMobile.to(
+          camera.position,
+          { z: -800, duration: 6, ease: "power2.out" },
+          12.5,
+        );
+
+        const moonTlMobile = gsap.timeline({
+          scrollTrigger: {
+            trigger: "#moon-zone",
+            start: "top top",
+            end: "+=60%",
+            scrub: 1.5,
+            pin: true,
+          },
+        });
+        moonTlMobile.to(
+          ".moon-catch-wrapper",
+          { opacity: 1, duration: 0.1 },
+          0,
+        );
+        moonTlMobile.fromTo(
+          ".moon-img",
+          { y: "-100vh", xPercent: -50, rotationZ: -90 },
+          {
+            y: "0vh",
+            xPercent: -60,
+            rotationZ: 0,
+            duration: 4,
+            ease: "power1.inOut",
+          },
+          0.5,
+        );
+        moonTlMobile.fromTo(
+          ".left-hand",
+          { x: "-80vw", y: "5vh", rotationZ: 20 },
+          {
+            x: "5vw",
+            y: "-20vh",
+            rotationZ: 20,
+            duration: 3,
+            ease: "power2.out",
+          },
+          0.5,
+        );
+        moonTlMobile.fromTo(
+          ".right-hand",
+          { x: "80vw", y: "-20vh", rotationZ: -20 },
+          {
+            x: "-15vw",
+            y: "-10vh",
+            rotationZ: 40,
+            duration: 3,
+            ease: "power2.out",
+          },
+          0.5,
+        );
+        moonTlMobile.to({}, { duration: 2 });
+      });
+
+      // TEXT TRANSITIONS
+      gsap.utils.toArray(".air-row").forEach((row, i) => {
+        let isEven = i % 2 === 0;
+        gsap.fromTo(
+          row,
+          { opacity: 0, x: isEven ? -150 : 150, filter: "blur(15px)" },
+          {
+            opacity: 1,
+            x: 0,
+            filter: "blur(0px)",
+            duration: 1.5,
+            ease: "expo.out",
+            scrollTrigger: {
+              trigger: row,
+              start: "top 85%",
+              toggleActions: "play reverse play reverse",
+            },
+          },
+        );
+      });
+
+      gsap.fromTo(
+        ".activity-card",
+        { opacity: 0, y: 100, rotation: 5, scale: 0.9 },
+        {
+          opacity: 1,
+          y: 0,
+          rotation: 0,
+          scale: 1,
+          duration: 1,
+          stagger: 0.2,
+          ease: "back.out(1.2)",
+          scrollTrigger: { trigger: ".activities", start: "top 80%" },
+        },
+      );
+
+      // CONTACT BOX GSAP ANIMATION (Fade and slide up)
+      gsap.fromTo(
+        ".contact-box",
+        { y: 100, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: { trigger: ".contact-zone", start: "top 85%" },
+        },
+      );
+
+      // ==========================================
+      // INTEGRATED VIDEO PROMO LOGIC
+      // ==========================================
+      const playPromoBtn = document.getElementById("play-promo-btn");
+      const closePromoBtn = document.getElementById("close-promo-btn");
+      const promoOverlay = document.getElementById("video-overlay-wrapper");
+      const promoVideo = document.getElementById("promo-bg-video");
+      const promoText = document.getElementById("promo-text-overlay");
+
+      let promoHideTimer;
+
+      playPromoBtn.addEventListener("click", () => {
+        promoOverlay.style.opacity = "1";
+        promoOverlay.style.pointerEvents = "auto";
+        promoVideo.play();
+
+        // AUTO SHOW TEXT FOR 2 SECONDS WITHOUT TOUCHING SCREEN
+        promoText.style.opacity = "1";
+        clearTimeout(promoHideTimer);
+        promoHideTimer = setTimeout(() => {
+          promoText.style.opacity = "0";
+        }, 2000);
+      });
+
+      closePromoBtn.addEventListener("click", () => {
+        promoOverlay.style.opacity = "0";
+        promoOverlay.style.pointerEvents = "none";
+        promoVideo.pause();
+        promoVideo.currentTime = 0;
+      });
+
+      promoOverlay.addEventListener("mousemove", (e) => {
+        promoText.style.opacity = "1";
+        clearTimeout(promoHideTimer);
+        promoHideTimer = setTimeout(() => {
+          promoText.style.opacity = "0";
+        }, 500);
+
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        promoVideo.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1.2)`;
+      });
+
+      promoOverlay.addEventListener("touchmove", (e) => {
+        promoText.style.opacity = "1";
+        clearTimeout(promoHideTimer);
+        promoHideTimer = setTimeout(() => {
+          promoText.style.opacity = "0";
+        }, 500);
+
+        const touch = e.touches[0];
+        const x = (touch.clientX / window.innerWidth - 0.5) * 20;
+        const y = (touch.clientY / window.innerHeight - 0.5) * 20;
+        promoVideo.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1.2)`;
+      });
+
+      promoOverlay.addEventListener("mouseleave", () => {
+        clearTimeout(promoHideTimer);
+        promoText.style.opacity = "0";
+      });
+
+      // ==========================================
+      // EVENTS TICKET FLIPPER LOGIC
+      // ==========================================
+      const eventsBtn = document.getElementById("open-events-btn");
+      const ticketModal = document.getElementById("ticket-modal");
+      const closeTicketBtn = document.getElementById("close-ticket-btn");
+      const ticketFlipper = document.getElementById("ticket-flipper");
+      const ticket3D = ticketFlipper.querySelector(".ticket-3d");
+
+      eventsBtn.addEventListener("click", () => {
+        ticketModal.classList.add("active");
+        ticket3D.classList.remove("flipped");
+      });
+
+      closeTicketBtn.addEventListener("click", () => {
+        ticketModal.classList.remove("active");
+      });
+
+      ticketFlipper.addEventListener("click", () => {
+        ticket3D.classList.toggle("flipped");
+      });
+
+      // ==========================================
+      // MOUSE-DRIVEN, AUTO-ROTATING CIRCULAR GALLERY
+      // ==========================================
+      const imageMap = {
+        stargazing: [
+          "images/s1.jpg",
+          "images/s2.jpg",
+          "images/s3.JPG",
+          "images/s4.JPG",
+          "images/s5.jpg",
+          "images/s6.jpg",
+        ],
+        equipment: [
+          "images/t1.jpg",
+          "images/t2.JPG",
+          "images/t3.jpg",
+          "images/m1.jpg",
+          "images/m2.jpg",
+          "images/m3.JPG",
+        ],
+        workshops: [
+          "images/e1.jpg",
+          "images/e2.jpg",
+          "images/e3.jpg",
+          "images/e11.JPG",
+          "images/e12.jpg",
+          "images/e13.jpg",
+        ],
+      };
+
+      const activityCards = document.querySelectorAll(".activity-card");
+      const galleryModal = document.getElementById("gallery-modal");
+      const carouselSpinner = document.getElementById("carousel-spinner");
+      const closeGalleryBtn = document.getElementById("close-gallery");
+      const maxOverlay = document.getElementById("maximized-overlay");
+      const maxImg = document.getElementById("maximized-img");
+
+      let targetCarouselRot = 0,
+        baseAutoSpeed = -0.15,
+        mouseInfluence = 0,
+        isModalOpen = false,
+        carouselRadius = 0;
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isModalOpen) return;
+        let normalizedX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseInfluence = normalizedX * 1.5;
+      });
+
+      window.addEventListener("touchmove", (e) => {
+        if (!isModalOpen) return;
+        let normalizedX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+        mouseInfluence = normalizedX * 2.5;
+      });
+
+      function renderCarousel() {
+        if (isModalOpen) {
+          targetCarouselRot += baseAutoSpeed + mouseInfluence;
+          gsap.set(carouselSpinner, {
+            z: -carouselRadius,
+            rotateY: targetCarouselRot,
+          });
+        }
+        requestAnimationFrame(renderCarousel);
+      }
+      renderCarousel();
+
+      activityCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          const category = card.getAttribute("data-category");
+          const baseImages = imageMap[category];
+          gsap.to(card, {
+            scale: 0.92,
+            duration: 0.15,
+            yoyo: true,
+            repeat: 1,
+            ease: "power2.inOut",
+          });
+          carouselSpinner.innerHTML = "";
+
+          const imagesToLoad = [
+            ...baseImages,
+            ...baseImages,
+            ...baseImages,
+            ...baseImages,
+          ];
+          const numItems = imagesToLoad.length;
+          const itemWidth = carouselSpinner.offsetWidth;
+          carouselRadius =
+            Math.round(itemWidth / 2 / Math.tan(Math.PI / numItems)) - 1;
+
+          imagesToLoad.forEach((src, index) => {
+            const item = document.createElement("div");
+            item.className = "carousel-item";
+            const angle = index * (360 / numItems);
+            item.style.transform = `rotateY(${angle}deg) translateZ(${carouselRadius}px)`;
+            item.innerHTML = `<img src="${src}" alt="${category} image" />`;
+
+            item.addEventListener("click", () => {
+              maxImg.src = src;
+              gsap.fromTo(
+                maxImg,
+                { scale: 0.8, rotation: -5 },
+                {
+                  scale: 1,
+                  rotation: 0,
+                  duration: 0.6,
+                  ease: "elastic.out(1, 0.7)",
+                },
+              );
+              gsap.to(maxOverlay, {
+                opacity: 1,
+                pointerEvents: "auto",
+                duration: 0.3,
+              });
+            });
+            carouselSpinner.appendChild(item);
+          });
+
+          targetCarouselRot = 0;
+          isModalOpen = true;
+          galleryModal.classList.add("active");
+          gsap.to(galleryModal, {
+            opacity: 1,
+            duration: 0.4,
+            ease: "power2.out",
+          });
+          gsap.fromTo(
+            carouselSpinner,
+            { rotateX: -20, rotateY: 180 },
+            { rotateX: 0, rotateY: 0, duration: 2, ease: "power3.out" },
+          );
+        });
+      });
+
+      closeGalleryBtn.addEventListener("click", () => {
+        gsap.to(galleryModal, {
+          opacity: 0,
+          duration: 0.4,
+          ease: "power2.in",
+          onComplete: () => {
+            galleryModal.classList.remove("active");
+            carouselSpinner.innerHTML = "";
+            isModalOpen = false;
+          },
+        });
+      });
+
+      maxOverlay.addEventListener("click", () => {
+        gsap.to(maxImg, { scale: 0.8, opacity: 0, duration: 0.3 });
+        gsap.to(maxOverlay, {
+          opacity: 0,
+          pointerEvents: "none",
+          duration: 0.3,
+          onComplete: () => {
+            gsap.set(maxImg, { opacity: 1 });
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

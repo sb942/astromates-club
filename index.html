@@ -6,7 +6,7 @@
     <title>AstroMates Club | Brutalist Space</title>
 
     <!-- FAVICON (SITE ICON) -->
-    <link rel="icon" type="image/png" href="images/l2.png" />
+    <link rel="icon" type="image/jpeg" href="images/l2.jpg" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@500;800&display=swap"
@@ -156,17 +156,6 @@
         overflow: hidden;
         z-index: 150;
         pointer-events: none;
-      }
-
-      .mega-hero-logo {
-        position: absolute;
-        top: 4vh;
-        z-index: 160;
-      }
-
-      .mega-hero-logo img {
-        width: 80px;
-        filter: drop-shadow(0 0 15px rgba(255, 51, 0, 0.4));
       }
 
       .mega-text-container {
@@ -702,6 +691,16 @@
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
       }
 
+      .contact-logo {
+        width: 60px;
+        height: 60px;
+        margin-top: 1.5rem;
+        background-color: #fff;
+        border-radius: 0;
+        object-fit: contain;
+        padding: 5px;
+      }
+
       .ticker-wrap {
         position: absolute;
         bottom: 0;
@@ -1017,6 +1016,7 @@
         transform: translate(-50%, -50%) scale(1.2);
         z-index: 1;
       }
+
       #promo-text-overlay {
         position: absolute;
         top: 50%;
@@ -1043,20 +1043,27 @@
          ========================================= */
       @media (max-width: 768px) {
         #loader-counter {
-          bottom: 5vh;
+          bottom: 12vh;
           right: 5vw;
           font-size: 18vw;
+          transform: translateY(0);
         }
 
+        .mega-hero {
+          justify-content: flex-start;
+          padding-top: 2vh;
+        }
         .mega-text-container {
-          margin-top: 0vh;
+          margin-top: 1vh;
         }
         .letter-mask {
-          font-size: 24vw;
+          font-size: 22vw;
         }
         .hero-blurb {
-          bottom: 8vh;
-          font-size: 0.7rem;
+          bottom: 15vh;
+          position: absolute;
+          font-size: 0.75rem;
+          width: 90%;
         }
 
         .shifted-content-wrapper {
@@ -1178,6 +1185,14 @@
         .contact-visuals {
           align-items: center;
           padding: 2rem 5%;
+          display: flex;
+          flex-direction: column;
+        }
+        .contact-logo {
+          display: block;
+          margin-top: 2rem;
+          width: 50px;
+          height: 50px;
         }
         .cofounder-img-wrap {
           max-width: 100%;
@@ -1401,7 +1416,7 @@
       </div>
     </section>
 
-    <!-- 5. CONTACT ZONE -->
+    <!-- 5. CONTACT ZONE (EDGE TO EDGE) -->
     <section class="contact-zone" id="contact-zone">
       <div class="contact-box">
         <div class="contact-content">
@@ -1430,6 +1445,11 @@
               >Neel Vankudre & Rounak Deshpande</span
             >
           </div>
+          <img
+            src="images/logo.png"
+            alt="AstroMates Logo"
+            class="contact-logo"
+          />
         </div>
 
         <div class="ticker-wrap">
@@ -1855,7 +1875,6 @@
           duration: 1,
         });
 
-      // FIX 1: Added anticipatePin: 1 and changed scrub to 1
       let mm = gsap.matchMedia();
       mm.add("(min-width: 769px)", () => {
         const teleTl = gsap.timeline({
